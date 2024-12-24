@@ -1,0 +1,19 @@
+﻿Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Calc", "Calc.csproj", "{CDD04881-AF1F-4CA7-A13C-F7AA0EFBC75E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+	Debug|Any CPU = Debug|Any CPU
+	ExportDebug|Any CPU = ExportDebug|Any CPU
+	ExportRelease|Any CPU = ExportRelease|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{CDD04881-AF1F-4CA7-A13C-F7AA0EFBC75E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CDD04881-AF1F-4CA7-A13C-F7AA0EFBC75E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CDD04881-AF1F-4CA7-A13C-F7AA0EFBC75E}.ExportDebug|Any CPU.ActiveCfg = ExportDebug|Any CPU
+		{CDD04881-AF1F-4CA7-A13C-F7AA0EFBC75E}.ExportDebug|Any CPU.Build.0 = ExportDebug|Any CPU
+		{CDD04881-AF1F-4CA7-A13C-F7AA0EFBC75E}.ExportRelease|Any CPU.ActiveCfg = ExportRelease|Any CPU
+		{CDD04881-AF1F-4CA7-A13C-F7AA0EFBC75E}.ExportRelease|Any CPU.Build.0 = ExportRelease|Any CPU
+	EndGlobalSection
+EndGlobal
