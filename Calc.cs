@@ -63,11 +63,15 @@ public partial class Calc : Node2D
 			leftNumber = Double.Parse(leftNumber.ToString() + num.ToString());
 			NumberStr(leftNumber);
 		}
-		if (state == "fractional")
+		if (state == "fractionalL")
 		{
 			fractional = Double.Parse(fractional.ToString() + num.ToString());
-			result = Double.Parse($"{leftNumber.ToString()},{fractional.ToString()}");
-			NumberStr(result);
+			NumberStr(Double.Parse($"{leftNumber},{fractional}"));
+		}
+		if (state == "fractionalR")
+		{
+			fractional = Double.Parse(fractional.ToString() + num.ToString());
+			NumberStr(Double.Parse($"{rightNumber},{fractional}"));
 		}
 		if (state == "rightInput")
 		{
@@ -79,18 +83,13 @@ public partial class Calc : Node2D
 
 	public void NumberStr(double numStr)
 	{
-		if (state == "default" && leftNumber == 0)
+		if (numStr == 0)
 		{
-			screen.PrintScreen(leftNumber.ToString());
+			screen.PrintScreen("0");
+			return;
 		}
-		else if (state == "rightInput" && rightNumber == 0)
-		{
-			screen.PrintScreen(rightNumber.ToString());
-		}
-		else
-		{
-			screen.PrintScreen(numStr.ToString("### ### ###.##"));
-		}
+
+		screen.PrintScreen(numStr.ToString("### ### ###.##"));
 	}
 
 
@@ -110,21 +109,27 @@ public partial class Calc : Node2D
 
 		if (state == "default")
 		{
-			if (operate != "=" && operate != ",")
+			if (operate == ",")
+			{
+				screen.PrintScreen($"{leftNumber},");
+				state = "fractionalL";
+				return;
+			}
+
+			if (operate != "=")
 			{
 				_operator = operate;
 				screen.PrintScreen(_operator);
 				state = "rightInput";
 			}
-
+		}
+		else if (state == "rightInput")
+		{
 			if (operate == ",")
 			{
-				screen.PrintScreen(leftNumber.ToString() + ",");
-				state = "fractional";
+				screen.PrintScreen($"{rightNumber},");
+				state = "fractionalR";
 			}
-		}
-		else
-		{
 			if (_operator == "+")
 			{
 				leftNumber = leftNumber + rightNumber;
@@ -154,14 +159,13 @@ public partial class Calc : Node2D
 				NumberStr(leftNumber);
 			}
 
-			if (operate != "=")
-			{
-				_operator = operate;
-			}
-
 			if (operate == "=")
 			{
 				state = "default";
+			}
+			else
+			{
+				_operator = operate;
 			}
 
 
