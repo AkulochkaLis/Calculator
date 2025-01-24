@@ -29,6 +29,8 @@ public partial class Calc : Node2D
 	private double rightNumber;
 	private double fractional;
 
+	private double rightFractional;
+
 	private double result;
 
 	private string _operator = "";
@@ -66,20 +68,23 @@ public partial class Calc : Node2D
 		if (state == "fractional")
 		{
 			fractional = Double.Parse(fractional.ToString() + num.ToString());
-			result = Double.Parse($"{leftNumber.ToString()},{fractional.ToString()}");
-			NumberStr(result);
+			NumberStr(Double.Parse($"{leftNumber.ToString()},{fractional.ToString()}"));
 		}
 		if (state == "rightInput")
 		{
 			rightNumber = Double.Parse(rightNumber.ToString() + num.ToString());
 			NumberStr(rightNumber);
 		}
-
+		if (state == "rightFractional")
+		{
+			rightFractional = Double.Parse(rightFractional.ToString() + num.ToString());
+			NumberStr(Double.Parse($"{rightNumber.ToString()},{rightFractional.ToString()}"));
+		}
 	}
 
 	public void NumberStr(double numStr)
 	{
-		if (state == "default" && leftNumber == 0)
+		if (numStr == 0)
 		{
 			screen.PrintScreen(leftNumber.ToString());
 		}
@@ -99,6 +104,8 @@ public partial class Calc : Node2D
 		if (operate == "AC")
 		{
 			state = "default";
+			fractional = 0;
+			rightFractional = 0;
 			numScreen = "";
 			leftNumber = 0;
 			rightNumber = 0;
@@ -107,8 +114,14 @@ public partial class Calc : Node2D
 			return;
 		}
 
+		if (state == "rightInput" && operate == ",")
+		{
+			screen.PrintScreen(rightNumber.ToString() + ",");
+			state = "rightFractional";
+			return;
+		}
 
-		if (state == "default")
+		if (state == "default" || state == "fractional")
 		{
 			if (operate != "=" && operate != ",")
 			{
@@ -123,13 +136,36 @@ public partial class Calc : Node2D
 				state = "fractional";
 			}
 		}
+
 		else
 		{
+			double result;
+			string resultStr;
+
 			if (_operator == "+")
 			{
-				leftNumber = leftNumber + rightNumber;
-				NumberStr(leftNumber);
-				GD.Print(leftNumber.ToString("### ### ###.##"));
+				result = double.Parse($"{leftNumber},{fractional}") + double.Parse($"{rightNumber},{rightFractional}");
+				NumberStr(result);
+				resultStr = result.ToString();
+				string[] numberParts = resultStr.Split(",");
+				leftNumber = double.Parse(numberParts[0]);
+				if (numberParts.Length > 1)
+				{
+					fractional = double.Parse(numberParts[1]);
+				}
+				else
+				{
+					fractional = 0;
+				}
+				rightFractional = 0;
+				state = "rightInput";
+				return;
+
+
+				GD.Print(leftNumber);
+				GD.Print(rightNumber);
+				GD.Print(fractional);
+				GD.Print(state);
 			}
 
 			if (_operator == "-")
@@ -163,8 +199,6 @@ public partial class Calc : Node2D
 			{
 				state = "default";
 			}
-
-
 		}
 	}
 }
