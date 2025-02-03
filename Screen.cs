@@ -1,6 +1,7 @@
 using Godot;
 using System;
-using System.Dynamic;
+
+namespace Calculator;
 
 public partial class Screen : Label
 {
@@ -13,7 +14,6 @@ public partial class Screen : Label
         HFlowContainer hFlowContainer = GetNode<HFlowContainer>("/root/Node2D/HBoxContainer/Buttons/Buttons/HFlowContainer");
         GD.Print(hFlowContainer);
         GD.Print("Here");
-        //OnScreen();
     }
 }
 

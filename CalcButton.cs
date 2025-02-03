@@ -1,19 +1,14 @@
 using Godot;
 using System;
-using System.Data.Common;
-using System.Diagnostics.Metrics;
-using System.Dynamic;
-using System.Runtime.CompilerServices;
-using System.Security.Cryptography.X509Certificates;
+
+namespace Calculator;
 
 public partial class CalcButton : Button
 {
-    public double textInt { get; set; }
+    public double TextInt { get; set; }
     public override void _Ready()
     {
-        // Code in this block run once for every button instance
         Pressed += OnClick;
-
     }
 
     public void OnClick()
@@ -26,9 +21,9 @@ public partial class CalcButton : Button
         }
         else
         {
-            textInt = TextDouble();
+            TextInt = TextDouble();
             Calc calc = GetNode<Calc>("/root/Node2D");
-            calc.Number(textInt);
+            calc.Number(TextInt);
         }
     }
 
