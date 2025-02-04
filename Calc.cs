@@ -7,7 +7,7 @@ namespace Calculator;
 enum CalculatorState
 {
     Default,
-    Fractional,
+    LeftFractional,
     RightInput,
     RightFranctional,
 }
@@ -33,7 +33,7 @@ public partial class Calc : Node2D
 
     private CalculatorState state = CalculatorState.Default;
 
-    private Action _operator = Action.Plus;
+    private Action _operator;
 
     private Screen screen;
 
@@ -42,7 +42,7 @@ public partial class Calc : Node2D
         screen = GetNode<Screen>("/root/Node2D/PanelContainer/Screen");
     }
 
-    public void Number(double num)
+    public void ConvertingNumbers(double num)
     {
         switch (state)
         {
@@ -52,7 +52,7 @@ public partial class Calc : Node2D
                     PrintNumber(leftNumber);
                     break;
                 }
-            case CalculatorState.Fractional:
+            case CalculatorState.LeftFractional:
                 {
                     fractional = double.Parse(fractional.ToString() + num.ToString());
                     PrintNumber(double.Parse($"{leftNumber},{fractional}"));
@@ -77,7 +77,7 @@ public partial class Calc : Node2D
         }
     }
 
-    public void Operator(string operate)
+    public void PerformingOperations(string operate)
     {
         Action action = ConvertToAction(operate);
 
@@ -100,7 +100,7 @@ public partial class Calc : Node2D
             return;
         }
 
-        if (state == CalculatorState.Default || state == CalculatorState.Fractional)
+        if (state == CalculatorState.Default || state == CalculatorState.LeftFractional)
         {
             if (action != Action.Equal && action != Action.Comma)
             {
@@ -113,7 +113,7 @@ public partial class Calc : Node2D
             if (action == Action.Comma)
             {
                 screen.PrintScreen(leftNumber.ToString() + ",");
-                state = CalculatorState.Fractional;
+                state = CalculatorState.LeftFractional;
                 return;
             }
         }
@@ -138,7 +138,7 @@ public partial class Calc : Node2D
                     {
                         double result = double.Parse($"{leftNumber},{fractional}") + double.Parse($"{rightNumber},{rightFractional}");
                         PrintNumber(result);
-                        SplitAndSafeNumber(result);
+                        SplitAndSaveNumber(result);
                         _operator = action;
                         break;
                     }
@@ -146,7 +146,7 @@ public partial class Calc : Node2D
                     {
                         double result = double.Parse($"{leftNumber},{fractional}") - double.Parse($"{rightNumber},{rightFractional}");
                         PrintNumber(result);
-                        SplitAndSafeNumber(result);
+                        SplitAndSaveNumber(result);
                         _operator = action;
                         break;
                     }
@@ -154,7 +154,7 @@ public partial class Calc : Node2D
                     {
                         double result = double.Parse($"{leftNumber},{fractional}") * double.Parse($"{rightNumber},{rightFractional}");
                         PrintNumber(result);
-                        SplitAndSafeNumber(result);
+                        SplitAndSaveNumber(result);
                         _operator = action;
                         break;
                     }
@@ -166,7 +166,7 @@ public partial class Calc : Node2D
                         }
                         double result = double.Parse($"{leftNumber},{fractional}") / double.Parse($"{rightNumber},{rightFractional}");
                         PrintNumber(result);
-                        SplitAndSafeNumber(result);
+                        SplitAndSaveNumber(result);
                         _operator = action;
                         break;
                     }
@@ -194,7 +194,7 @@ public partial class Calc : Node2D
     {
         Action.Plus => "+",
         Action.Minus => "-",
-        Action.Reset => "0",
+        Action.Reset => "AC",
         Action.Division => "/",
         Action.Multiplication => "*",
         _ => throw new NotImplementedException(),
@@ -216,7 +216,7 @@ public partial class Calc : Node2D
         }
     }
 
-    private void SplitAndSafeNumber(double result)
+    private void SplitAndSaveNumber(double result)
     {
         string resultStr = result.ToString();
         string[] numberParts = resultStr.Split(",");

@@ -17,13 +17,13 @@ public partial class CalcButton : Button
         if (Text == "+" || Text == "-" || Text == "/" || Text == "*" || Text == "=" || Text == "AC" || Text == ",")
         {
             Calc calc = GetNode<Calc>("/root/Node2D");
-            calc.Operator(Text);
+            calc.PerformingOperations(Text);
         }
         else
         {
             TextInt = TextDouble();
             Calc calc = GetNode<Calc>("/root/Node2D");
-            calc.Number(TextInt);
+            calc.ConvertingNumbers(TextInt);
         }
     }
 
