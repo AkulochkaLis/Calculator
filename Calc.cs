@@ -1,15 +1,15 @@
 using Godot;
 using System;
-using System.Collections;
+using System.Collections.Generic;
 
 namespace Calculator;
 
 enum CalculatorState
 {
-    Default,
+    LeftInput,
     LeftFractional,
     RightInput,
-    RightFranctional,
+    RightFractional,
 }
 
 enum Action
@@ -27,13 +27,13 @@ public partial class Calc : Node2D
 {
     private double leftNumber;
     private double rightNumber;
-    private double fractional;
+    private double leftFractional;
 
     private double rightFractional;
 
-    private CalculatorState state = CalculatorState.Default;
+    private CalculatorState state = CalculatorState.LeftInput;
 
-    private Action _operator;
+    private Action action;
 
     private Screen screen;
 
@@ -46,7 +46,7 @@ public partial class Calc : Node2D
     {
         switch (state)
         {
-            case CalculatorState.Default:
+            case CalculatorState.LeftInput:
                 {
                     leftNumber = double.Parse(leftNumber.ToString() + num.ToString());
                     PrintNumber(leftNumber);
@@ -54,8 +54,8 @@ public partial class Calc : Node2D
                 }
             case CalculatorState.LeftFractional:
                 {
-                    fractional = double.Parse(fractional.ToString() + num.ToString());
-                    PrintNumber(double.Parse($"{leftNumber},{fractional}"));
+                    leftFractional = double.Parse(leftFractional.ToString() + num.ToString());
+                    PrintNumber(double.Parse($"{leftNumber},{leftFractional}"));
                     break;
                 }
             case CalculatorState.RightInput:
@@ -64,7 +64,7 @@ public partial class Calc : Node2D
                     PrintNumber(rightNumber);
                     break;
                 }
-            case CalculatorState.RightFranctional:
+            case CalculatorState.RightFractional:
                 {
                     rightFractional = double.Parse(rightFractional.ToString() + num.ToString());
                     PrintNumber(double.Parse($"{rightNumber},{rightFractional}"));
@@ -79,102 +79,93 @@ public partial class Calc : Node2D
 
     public void PerformingOperations(string operate)
     {
-        Action action = ConvertToAction(operate);
+        Action currentAction = ConvertToAction(operate);
 
-        if (action == Action.Reset)
+        if (currentAction == Action.Reset)
         {
-            state = CalculatorState.Default;
-            fractional = 0;
+            state = CalculatorState.LeftInput;
+            leftFractional = 0;
             rightFractional = 0;
             leftNumber = 0;
             rightNumber = 0;
-            _operator = action;
+            action = currentAction;
             screen.PrintScreen(leftNumber.ToString());
             return;
         }
 
-        if (state == CalculatorState.RightInput && action == Action.Comma)
+        if (currentAction == Action.Comma)
         {
             screen.PrintScreen(rightNumber.ToString() + ",");
-            state = CalculatorState.RightFranctional;
+            state = state switch
+            {
+                CalculatorState.RightInput => CalculatorState.RightFractional,
+                CalculatorState.LeftInput => CalculatorState.LeftFractional,
+                _ => throw new NotImplementedException("unsupported state"),
+            };
             return;
         }
 
-        if (state == CalculatorState.Default || state == CalculatorState.LeftFractional)
+        if (isLeftInput(state) && currentAction == Action.Equal)
         {
-            if (action != Action.Equal && action != Action.Comma)
-            {
-                _operator = action;
-                screen.PrintScreen(ConvertActionToString(action));
-                state = CalculatorState.RightInput;
-                return;
-            }
-
-            if (action == Action.Comma)
-            {
-                screen.PrintScreen(leftNumber.ToString() + ",");
-                state = CalculatorState.LeftFractional;
-                return;
-            }
+            PrintNumber(leftNumber);
+            return;
         }
 
-        else
+        if (isLeftInput(state) && isMathAction(action))
         {
-            if (action == Action.Equal)
-            {
-                state = CalculatorState.Default;
-            }
+            action = currentAction;
+            screen.PrintScreen(ConvertActionToString(currentAction));
+            state = CalculatorState.RightInput;
+            return;
+        }
 
-            if (action != Action.Equal)
-            {
-                _operator = action;
-                screen.PrintScreen(ConvertActionToString(action));
-                return;
-            }
+        if (isRightInput(state) && currentAction == Action.Equal)
+        {
+            state = CalculatorState.LeftInput;
+        }
 
-            switch (_operator)
-            {
-                case Action.Plus:
+        switch (action)
+        {
+            case Action.Plus:
+                {
+                    double result = double.Parse($"{leftNumber},{leftFractional}") + double.Parse($"{rightNumber},{rightFractional}");
+                    PrintNumber(result);
+                    SplitAndSaveNumber(result);
+                    action = currentAction;
+                    break;
+                }
+            case Action.Minus:
+                {
+                    double result = double.Parse($"{leftNumber},{leftFractional}") - double.Parse($"{rightNumber},{rightFractional}");
+                    PrintNumber(result);
+                    SplitAndSaveNumber(result);
+                    action = currentAction;
+                    break;
+                }
+            case Action.Multiplication:
+                {
+                    double result = double.Parse($"{leftNumber},{leftFractional}") * double.Parse($"{rightNumber},{rightFractional}");
+                    PrintNumber(result);
+                    SplitAndSaveNumber(result);
+                    action = currentAction;
+                    break;
+                }
+            case Action.Division:
+                {
+                    if (rightNumber == 0)
                     {
-                        double result = double.Parse($"{leftNumber},{fractional}") + double.Parse($"{rightNumber},{rightFractional}");
-                        PrintNumber(result);
-                        SplitAndSaveNumber(result);
-                        _operator = action;
-                        break;
+                        screen.PrintScreen("Error");
                     }
-                case Action.Minus:
-                    {
-                        double result = double.Parse($"{leftNumber},{fractional}") - double.Parse($"{rightNumber},{rightFractional}");
-                        PrintNumber(result);
-                        SplitAndSaveNumber(result);
-                        _operator = action;
-                        break;
-                    }
-                case Action.Multiplication:
-                    {
-                        double result = double.Parse($"{leftNumber},{fractional}") * double.Parse($"{rightNumber},{rightFractional}");
-                        PrintNumber(result);
-                        SplitAndSaveNumber(result);
-                        _operator = action;
-                        break;
-                    }
-                case Action.Division:
-                    {
-                        if (rightNumber == 0)
-                        {
-                            screen.PrintScreen("Error");
-                        }
-                        double result = double.Parse($"{leftNumber},{fractional}") / double.Parse($"{rightNumber},{rightFractional}");
-                        PrintNumber(result);
-                        SplitAndSaveNumber(result);
-                        _operator = action;
-                        break;
-                    }
-                default:
-                    {
-                        throw new NotImplementedException("Unsupported action");
-                    }
-            }
+                    double result = double.Parse($"{leftNumber},{leftFractional}") / double.Parse($"{rightNumber},{rightFractional}");
+                    PrintNumber(result);
+                    SplitAndSaveNumber(result);
+                    action = currentAction;
+                    break;
+                }
+            default:
+                {
+                    throw new NotImplementedException("Unsupported action");
+                }
         }
     }
 
@@ -200,6 +191,25 @@ public partial class Calc : Node2D
         _ => throw new NotImplementedException(),
     };
 
+    private bool isServiceAction(Action action)
+    {
+        return new List<Action>() { Action.Comma, Action.Reset, Action.Equal }.Contains(action);
+    }
+    private bool isMathAction(Action action)
+    {
+        return !isServiceAction(action);
+    }
+
+    private bool isLeftInput(CalculatorState state)
+    {
+        return state == CalculatorState.LeftFractional || state == CalculatorState.LeftInput;
+    }
+
+    private bool isRightInput(CalculatorState state)
+    {
+        return !isLeftInput(state);
+    }
+
     private void PrintNumber(double numStr)
     {
         if (numStr == 0)
@@ -221,7 +231,7 @@ public partial class Calc : Node2D
         string resultStr = result.ToString();
         string[] numberParts = resultStr.Split(",");
         leftNumber = double.Parse(numberParts[0]);
-        fractional = numberParts.Length > 1 ? double.Parse(numberParts[1]) : 0;
+        leftFractional = numberParts.Length > 1 ? double.Parse(numberParts[1]) : 0;
         rightFractional = 0;
         rightNumber = 0;
         state = CalculatorState.RightInput;
