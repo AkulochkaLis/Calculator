@@ -21,6 +21,7 @@ enum Action
     Reset,
     Comma,
     Equal,
+    Noop,
 }
 
 public partial class Calc : Node2D
@@ -88,7 +89,7 @@ public partial class Calc : Node2D
             rightFractional = 0;
             leftNumber = 0;
             rightNumber = 0;
-            action = currentAction;
+            action = Action.Noop;
             screen.PrintScreen(leftNumber.ToString());
             return;
         }
@@ -163,9 +164,10 @@ public partial class Calc : Node2D
                     action = currentAction;
                     break;
                 }
+            case Action.Noop: break;
             default:
                 {
-                    throw new NotImplementedException("Unsupported action");
+                    throw new NotImplementedException($"Unsupported action ${action}");
                 }
         }
     }
