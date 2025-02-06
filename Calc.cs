@@ -95,7 +95,8 @@ public partial class Calc : Node2D
 
         if (currentAction == Action.Comma)
         {
-            screen.PrintScreen(rightNumber.ToString() + ",");
+            double numberToPrint = isLeftInput(state) ? leftNumber : rightNumber;
+            screen.PrintScreen(numberToPrint.ToString() + ",");
             state = state switch
             {
                 CalculatorState.RightInput => CalculatorState.RightFractional,
