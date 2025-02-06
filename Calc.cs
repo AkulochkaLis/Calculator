@@ -24,13 +24,26 @@ enum Action
     Noop,
 }
 
+class MyNumber
+{
+    public int number = 0;
+    public int fractional = 0;
+
+    public void AddNumber(int num)
+    {
+        number = int.Parse($"{number}{num}");
+    }
+
+    public void AddFractional(int num)
+    {
+        fractional = int.Parse($"{fractional}{num}");
+    }
+}
+
 public partial class Calc : Node2D
 {
-    private double leftNumber;
-    private double rightNumber;
-    private double leftFractional;
-
-    private double rightFractional;
+    private MyNumber leftNumber = new();
+    private MyNumber rightNumber = new();
 
     private CalculatorState state = CalculatorState.LeftInput;
 
@@ -49,25 +62,25 @@ public partial class Calc : Node2D
         {
             case CalculatorState.LeftInput:
                 {
-                    leftNumber = double.Parse(leftNumber.ToString() + num.ToString());
+                    leftNumber.AddNumber((int)num);
                     PrintNumber(leftNumber);
                     break;
                 }
             case CalculatorState.LeftFractional:
                 {
-                    leftFractional = double.Parse(leftFractional.ToString() + num.ToString());
+                    leftNumber.AddFractional((int)num);
                     PrintNumber(double.Parse($"{leftNumber},{leftFractional}"));
                     break;
                 }
             case CalculatorState.RightInput:
                 {
-                    rightNumber = double.Parse(rightNumber.ToString() + num.ToString());
+                    rightNumber.AddNumber((int)num);
                     PrintNumber(rightNumber);
                     break;
                 }
             case CalculatorState.RightFractional:
                 {
-                    rightFractional = double.Parse(rightFractional.ToString() + num.ToString());
+                    rightNumber.AddFractional((int)num);
                     PrintNumber(double.Parse($"{rightNumber},{rightFractional}"));
                     break;
                 }
