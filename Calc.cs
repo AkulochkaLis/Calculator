@@ -113,17 +113,12 @@ public partial class Calc : Node2D
             return;
         }
 
-        if (isLeftInput(state) && isMathAction(action))
+        if (isLeftInput(state) && isMathAction(currentAction))
         {
             action = currentAction;
             screen.PrintScreen(ConvertActionToString(currentAction));
             state = CalculatorState.RightInput;
             return;
-        }
-
-        if (isRightInput(state) && currentAction == Action.Equal)
-        {
-            state = CalculatorState.LeftInput;
         }
 
         switch (action)
@@ -167,8 +162,17 @@ public partial class Calc : Node2D
             case Action.Noop: break;
             default:
                 {
-                    throw new NotImplementedException($"Unsupported action ${action}");
+                    throw new NotImplementedException($"Unsupported action {action}");
                 }
+        }
+
+        if (currentAction == Action.Equal)
+        {
+            state = CalculatorState.LeftInput;
+        }
+        else
+        {
+            state = CalculatorState.RightInput;
         }
     }
 
@@ -237,7 +241,6 @@ public partial class Calc : Node2D
         leftFractional = numberParts.Length > 1 ? double.Parse(numberParts[1]) : 0;
         rightFractional = 0;
         rightNumber = 0;
-        state = CalculatorState.RightInput;
     }
 }
 
